@@ -110,7 +110,6 @@ public class Assembler {
 	public static String assemble(String fileName) throws IOException {
 		PrintWriter error = new PrintWriter(new BufferedWriter(new FileWriter("src/errors.txt")));
 		String outputFile = fileName.replaceAll(".asm", ".obj");
-//		PrintStream fileOut = new PrintStream("src/output.obj");
 		PrintStream fileOut = new PrintStream(outputFile);
 		System.setOut(fileOut);
 		HashMap<String, String> vars = new HashMap<String, String>();
