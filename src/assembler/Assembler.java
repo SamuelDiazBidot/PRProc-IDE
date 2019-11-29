@@ -24,6 +24,7 @@ public class Assembler {
 		CONSTANT,
 		COMMENT,
 		BLANKLINE,
+		SPECIAL,
 		NONE
 	}
 	
@@ -31,13 +32,13 @@ public class Assembler {
 	 * Matches a string with a format type
 	 */	
 	static Format getFormat(String line) {
-		if(line.matches("\\t(LOADRIND|STORERIND|ADD|SUB|AND|OR|XOR|NOT|NEG|SHIFTR|SHIFTL|ROTAR|ROTAL|GRT|GRTEQ|EQ|NEQ)\\s(\\s*R[0-7]\\s*,|\\s*R[0-7]){1,3}(\\s*\\/\\/.*)?\\s*$")) { 
+		if(line.matches("(\\s{4}|\\t)(LOADRIND|STORERIND|ADD|SUB|AND|OR|XOR|NOT|NEG|SHIFTR|SHIFTL|ROTAR|ROTAL|GRT|GRTEQ|EQ|NEQ)\\s(\\s*R[0-7]\\s*,|\\s*R[0-7]){1,3}(\\s*\\/\\/.*)?\\s*$")) { 
 			return Format.FORMAT1;
 		}
-		else if(line.matches("\\t(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP)\\s+R[0-7]\\s*(,\\s*(#[0-9a-fA-f]*|\\w+))?(\\s*\\/\\/.*)?\\s*$")) {
+		else if(line.matches("(\\s{4}|\\t)(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP)\\s+R[0-7]\\s*(,\\s*(#[0-9a-fA-f]*|\\w+))?(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.FORMAT2;
 		}
-		else if(line.matches("\\torg\\s(\\d[a-fA-F]|[a-fA-F]\\d|\\d{1,2}|[a-fA-F]{1,2})(\\s*\\/\\/.*)?\\s*$")) {
+		else if(line.matches("(\\s{4}|\\t)org\\s(\\d|[a-fA-F]){1,3}(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.ORIGIN;
 		}
 		else if(line.matches("\\w*?\\sdb\\s(\\d[a-fA-F]|[a-fA-F]\\d|\\d{1,2}|[a-fA-F]{1,2})(,\\s*(\\d[a-fA-F]|[a-fA-F]\\d|\\d{1,2}|[a-fA-F]{1,2}))*(\\s*\\/\\/.*)?\\s*$")) {
@@ -46,7 +47,7 @@ public class Assembler {
 		else if(line.matches("const\\s\\w+\\s(\\d[a-fA-F]|[a-fA-F]\\d|\\d{1,2}|[a-fA-F]{1,2})(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.CONSTANT;
 		}
-		else if(line.matches("\\t(JMPADDR|JCONDADDR|CALL)\\s\\w+?(\\s*\\/\\/.*)?\\s*$")) {
+		else if(line.matches("(\\s{4}|\\t)(JMPADDR|JCONDADDR|CALL)\\s\\w+?(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.FORMAT3;
 		}
 		else if(line.matches("(\\w+):(\\s*\\/\\/.*)?(\\s*$)")) {
@@ -57,6 +58,9 @@ public class Assembler {
 		}
 		else if(line.matches("\\s*")) {
 			return Format.BLANKLINE;
+		}
+		else if(line.matches("(\\s{4}|\\t)(RETURN|NOP)(\\s*\\/\\/.*)?\\s*$")) {
+			return Format.SPECIAL;
 		}
 		else {
 			return Format.NONE;
@@ -158,6 +162,9 @@ public class Assembler {
 				case COMMENT:
 					break;
 				case BLANKLINE:
+					break;
+				case SPECIAL:
+					linePos += 2;
 					break;
 				default:
 					break;
@@ -341,6 +348,14 @@ public class Assembler {
 				case COMMENT:
 					break;
 				case BLANKLINE:
+					break;
+				case SPECIAL:
+					result.append(opCode(tokens[1]));
+					result.append("00000000000");
+					resultHexa = Integer.toHexString(Integer.parseInt(result.substring(0),2)).toUpperCase();
+					if(linePos%2 == 1) linePos++;
+					if(ordered.put(linePos++, String.format("0" + resultHexa.toString().substring(0, 2)))!=null)
+						overwriteWarning(error, linePos-1);
 					break;
 				default: 
 					errorDetected(error ,asmLinePos, "Syntax error", line); 

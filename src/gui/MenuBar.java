@@ -131,7 +131,7 @@ public class MenuBar extends JMenuBar{
 						} else if(!compiled) {
 							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
 						} else {
-							for(int i = 0; i < 4096; i++) {
+							for(int i = 0; i < 4095; i++) {
 								simulator.execute_instruction();
 								currLine.refresh(simulator.getCurrInstruction());
 								characterDisplays.forEach(display -> display.update(simulator.getMemory()));
