@@ -399,14 +399,14 @@ public class MenuBar extends JMenuBar{
 	public int getIOIndex() {
 		String input = JOptionPane.showInputDialog("Read/Write from: ", 0);
 		try {
-			int index = Integer.parseInt(input);
+			int index = Integer.parseInt(input, 16);
 			if(index < 0 || index > 4095) {
-				JOptionPane.showMessageDialog(null, "Please enter a valid address number between 0 and 4095");
+				JOptionPane.showMessageDialog(null, "Please enter a valid address number between 0x0 and 0xFFF");
 				return -1;
 			}
 			return index;
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Please enter a valid number");
+			JOptionPane.showMessageDialog(null, "Please enter a valid hexadecimal number");
 			return -1;
 		}
 	}
