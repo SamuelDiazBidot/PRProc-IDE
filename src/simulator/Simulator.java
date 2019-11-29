@@ -75,7 +75,7 @@ public class Simulator {
 			memory[f2address] = register[ra];
 			pc+=2;
 			break;
-			//PUSH	[mem[SP]] <- R[Ra] SP <- SP – 1
+			//PUSH	[mem[SP]] <- R[Ra] SP <- SP ï¿½ 1
 		case "00100":
 			currInstruction = instructionRegister + ": PUSH" + " R" + Integer.toString(ra);
 			memory[sp] = register[ra];
@@ -278,7 +278,7 @@ public class Simulator {
 			}
 			else pc += 2;
 			break;
-			//LOOP [R[ra]] <-[R[ra]] – 1 If R[Ra] != 0 [pc] <- address
+			//LOOP [R[ra]] <-[R[ra]] ï¿½ 1 If R[Ra] != 0 [pc] <- address
 		case "11000": 
 			currInstruction = instructionRegister + ": LOOP" + " R" + Integer.toString(ra) + ", " + Integer.toHexString(f2address);
 			int reg = Integer.parseInt(register[ra], 16);

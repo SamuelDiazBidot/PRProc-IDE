@@ -165,9 +165,9 @@ public class MenuBar extends JMenuBar{
 						} else if(!compiled) {
 							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
 						} else {
-//							if(!keyboardDisplays.isEmpty()) {
-//								simulator.keyboardEdit(hexindex, keyboardDisplays.get(0).getBufferedValues());
-//							}
+							//							if(!keyboardDisplays.isEmpty()) {
+							//								simulator.keyboardEdit(hexindex, keyboardDisplays.get(0).getBufferedValues());
+							//							}
 							keyboardDisplays.forEach(display -> {simulator.keyboardEdit(hexindex, display.getBufferedValues());});
 							simulator.execute_instruction();
 							currLine.refresh(simulator.getCurrInstruction());
@@ -301,16 +301,9 @@ public class MenuBar extends JMenuBar{
 		segmentDisplay.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if(getCurrentFile() == null) {
-							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
-						} else if(!compiled) {
-							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						}
-						else {
-							int index = getIOIndex();
-							if(index != -1) {
-								segmentDisplays.add(new DisplayPanel(simulator, index));
-							}
+						int index = getIOIndex();
+						if(index != -1) {
+							segmentDisplays.add(new DisplayPanel(simulator, index));
 						}
 					}
 				}
@@ -322,16 +315,9 @@ public class MenuBar extends JMenuBar{
 		hexkey.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if(getCurrentFile() == null) {
-							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
-						} else if(!compiled) {
-							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						}else {
-							hexindex = getIOIndex();
-							if(hexindex != -1) {
-//								HexKeyBoardPanel keyboard = new HexKeyBoardPanel(tables, simulator, hexindex);
-								keyboardDisplays.add(new HexKeyBoardPanel(tables, simulator, hexindex));
-							}
+						hexindex = getIOIndex();
+						if(hexindex != -1) {
+							keyboardDisplays.add(new HexKeyBoardPanel(tables, simulator, hexindex));
 						}
 					}
 				}
@@ -342,16 +328,9 @@ public class MenuBar extends JMenuBar{
 		charDisp.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if(getCurrentFile() == null) {
-							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
-						} else if(!compiled) {
-							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						}
-						else {
-							int index = getIOIndex();
-							if(index != -1) {
-								characterDisplays.add(new CharacterPanel(simulator.getMemory(), index));
-							}
+						int index = getIOIndex();
+						if(index != -1) {
+							characterDisplays.add(new CharacterPanel(simulator.getMemory(), index));
 						}
 					}
 				}
@@ -364,15 +343,9 @@ public class MenuBar extends JMenuBar{
 		trafficL.addActionListener(	
 				new ActionListener() {	
 					public void actionPerformed(ActionEvent e) {
-						if(getCurrentFile() == null) {
-							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
-						} else if(!compiled) {
-							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						} else {
-							lightindex = getIOIndex();
-							if(lightindex != -1) {
-								trafficDisplays.add(new TrafficLightPanel(simulator, lightindex));
-							}
+						lightindex = getIOIndex();
+						if(lightindex != -1) {
+							trafficDisplays.add(new TrafficLightPanel(simulator, lightindex));
 						}
 					}
 				}

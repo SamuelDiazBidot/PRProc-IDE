@@ -16,7 +16,8 @@ import simulator.Simulator;
 public class Table extends JPanel{
 	private JTable memory;
 	private JTable registry;
-	private Integer[] index = new Integer[2048];
+//	private Integer[] index = new Integer[2048];
+	private String[] index = new String[2048];
 	private String[] registerIndex = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7" };
 	private String[] memoryEven = new String[2048];
 	private String[] memoryOdd = new String[2048];
@@ -26,7 +27,7 @@ public class Table extends JPanel{
 	public Table(String[] memorydata, String[] register){
 		int y =0;
 		for(int i =0; i<4096; i += 2) {
-			index[y] = i;
+			index[y] = Integer.toHexString(i).toUpperCase();
 			y++;
 		}
 
