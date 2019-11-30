@@ -33,7 +33,6 @@ public class ColorsKeywords{
 			final StyleContext context = StyleContext.getDefaultStyleContext();
 			final AttributeSet attribute = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, Color.BLUE);
 			final AttributeSet attrBlack = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, Color.BLACK);
-//			final AttributeSet attrBrown = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, new Color(4,190,15));
 			final AttributeSet attrBrown = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, new Color(120,79,40));
 
 				this.document = new DefaultStyledDocument() {

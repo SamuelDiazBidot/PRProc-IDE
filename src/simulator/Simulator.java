@@ -27,7 +27,7 @@ public class Simulator {
 
 		//breaking binary into necessary components for instruction execution
 		String opcode = binaryInstruction.substring(0, 5);
-		int ra = Integer.parseInt(binaryInstruction.substring(5, 8), 2); 
+		int ra = Integer.parseInt(binaryInstruction.substring(5, 8), 2);
 		int rb = Integer.parseInt(binaryInstruction.substring(8, 11), 2);
 		int rc = Integer.parseInt(binaryInstruction.substring(11,14), 2);
 		int f2address = Integer.parseInt(binaryInstruction.substring(8, 16), 2);

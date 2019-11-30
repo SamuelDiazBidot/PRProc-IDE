@@ -37,6 +37,7 @@ import simulator.Simulator;
 public class MenuBar extends JMenuBar{
 	private String currFile;
 	private boolean compiled = false;
+	private boolean finished = false;
 	private int hexindex, lightindex;
 
 	public MenuBar(JFrame jf, JTextPane textArea, JLabel errors, Simulator simulator, Table tables, CurrentLinePanel currLine) {
@@ -103,6 +104,7 @@ public class MenuBar extends JMenuBar{
 								segmentDisplays.forEach(display -> display.refresh(simulator));
 								trafficDisplays.forEach(display -> display.refresh(simulator, lightindex));
 								compiled = true;
+								finished = false;
 								br.close();
 							} catch (IOException e1) {}
 						}
@@ -130,16 +132,21 @@ public class MenuBar extends JMenuBar{
 							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
 						} else if(!compiled) {
 							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						} else {
-							for(int i = 0; i < 4095; i++) {
-								simulator.execute_instruction();
-								currLine.refresh(simulator.getCurrInstruction());
-								characterDisplays.forEach(display -> display.update(simulator.getMemory()));
-								segmentDisplays.forEach(display -> display.refresh(simulator));
-								trafficDisplays.forEach(display -> display.refresh(simulator,lightindex));
+						} else if(!finished) {
+							for(int i = 0; i < 4096; i++) {
+								try {
+									simulator.execute_instruction();
+									currLine.refresh(simulator.getCurrInstruction());
+									characterDisplays.forEach(display -> display.update(simulator.getMemory()));
+									segmentDisplays.forEach(display -> display.refresh(simulator));
+									trafficDisplays.forEach(display -> display.refresh(simulator,lightindex));
+								}catch (ArrayIndexOutOfBoundsException f){
+									break;
+								}
 							}
-							tables.update(simulator.getMemory(), simulator.getRegister());
 						}
+						tables.update(simulator.getMemory(), simulator.getRegister());
+						finished = true;
 					}
 				}
 				);
@@ -164,10 +171,7 @@ public class MenuBar extends JMenuBar{
 							JOptionPane.showMessageDialog(null, "No file to run.\nPlease save or load a file.");
 						} else if(!compiled) {
 							JOptionPane.showMessageDialog(null, "No program to run.\nPlease compile a program.");
-						} else {
-							//							if(!keyboardDisplays.isEmpty()) {
-							//								simulator.keyboardEdit(hexindex, keyboardDisplays.get(0).getBufferedValues());
-							//							}
+						} else if (!finished){
 							keyboardDisplays.forEach(display -> {simulator.keyboardEdit(hexindex, display.getBufferedValues());});
 							simulator.execute_instruction();
 							currLine.refresh(simulator.getCurrInstruction());
@@ -176,7 +180,6 @@ public class MenuBar extends JMenuBar{
 							characterDisplays.forEach(display -> display.update(simulator.getMemory()));
 							segmentDisplays.forEach(display -> display.refresh(simulator));
 							trafficDisplays.forEach(display -> display.refresh(simulator,lightindex));
-							//	simulator.resetRegChange();
 						}
 					}
 				}
