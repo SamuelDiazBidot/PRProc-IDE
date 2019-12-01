@@ -357,7 +357,7 @@ public class Assembler {
 					if(ordered.put(linePos++, String.format(resultHexa.toString().substring(0, 2)))!=null)
 						overwriteWarning(error, linePos-1);
 					break;
-				default: 
+				default:
 					errorDetected(error ,asmLinePos, "Syntax error", line); 
 					break;
 				}
@@ -387,11 +387,46 @@ public class Assembler {
 	 * Writes a given error message with a line position to a specific file
 	 */
 	private static void errorDetected(PrintWriter writer,int linePos, String errorType, String line) {
-		writer.append(errorType + " at line: " + linePos + "  " + line);
+		writer.append(errorType + " at line: " + linePos + "  \"" + line + "\" " + findError(line));
 		writer.append('\n');
 	}
 	private static void overwriteWarning(PrintWriter writer, int linePos) {
 		writer.append("Warning: Data at Address " + linePos + " has been overwritten.  ");
 		writer.append('\n');
+	}
+	private static String findError(String line) {
+		String errorMsg = "";
+		//Errors for format 1
+		if(line.matches(".*(LOADRIND|STORERIND|ADD|SUB|AND|OR|XOR|NOT|NEG|SHIFTR|SHIFTL|ROTAR|ROTAL|GRT|GRTEQ|EQ|NEQ).*")) {
+			if(!line.matches("(\\s{4}|\\t).*"))
+				errorMsg = "Line missing a tab or 4 spaces before instruction";
+			else if(!line.matches(".*(\\s*R[0-7]\\s*,|\\s*R[0-7]){1,3}.*"))
+				errorMsg = "Instruction has an invalid amount of registers.";
+		}
+		//Errors for format 2
+		else if(line.matches(".*(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP).*")) {
+			if(!line.matches("(\\s{4}|\\t).*"))
+				errorMsg = "Line missing a tab or 4 spaces before instruction";
+			else if(!line.matches(".*R[0-7].*"))
+				errorMsg = "Instruction must have 1 register.";
+			else if(line.matches("(.*R[0-7].*){2,}"))
+				errorMsg = "Instruction has more than 1 register.";
+		}
+		//Errors for Return and Nop
+		else if(line.matches(".*(RETURN|NOP).*")) {
+			if(!line.matches("(\\s{4}|\\t).*"))
+				errorMsg = "Line missing a tab or 4 spaces before instruction.";
+			else if(line.matches(".*"))
+				errorMsg = "Instruction does not contains any parameters.";
+		}
+		//Errors for format 3
+		else if(line.matches(".*(JMPADDR|JCONDADDR|CALL).*")) {
+			if(!line.matches("(\\s{4}|\\t).*"))
+				errorMsg = "Line missing a tab or 4 spaces before instruction.";
+			else if(line.matches("\\s.*"))
+				errorMsg = "Instruction only needs and address.";
+		}
+		
+		return errorMsg;
 	}
 }
