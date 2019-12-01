@@ -354,7 +354,7 @@ public class Assembler {
 					result.append("00000000000");
 					resultHexa = Integer.toHexString(Integer.parseInt(result.substring(0),2)).toUpperCase();
 					if(linePos%2 == 1) linePos++;
-					if(ordered.put(linePos++, String.format("0" + resultHexa.toString().substring(0, 2)))!=null)
+					if(ordered.put(linePos++, String.format(resultHexa.toString().substring(0, 2)))!=null)
 						overwriteWarning(error, linePos-1);
 					break;
 				default: 
