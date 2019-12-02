@@ -9,7 +9,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 public class Assembler {
-	 
+
 	/*
 	 * All possible states that a line can be interpreted as
 	 * 
@@ -27,7 +27,7 @@ public class Assembler {
 		SPECIAL,
 		NONE
 	}
-	
+
 	/*
 	 * Matches a string with a format type
 	 */	
@@ -35,7 +35,7 @@ public class Assembler {
 		if(line.matches("(\\s{4}|\\t)(LOADRIND|STORERIND|ADD|SUB|AND|OR|XOR|NOT|NEG|SHIFTR|SHIFTL|ROTAR|ROTAL|GRT|GRTEQ|EQ|NEQ)\\s(\\s*R[0-7]\\s*,|\\s*R[0-7]){1,3}(\\s*\\/\\/.*)?\\s*$")) { 
 			return Format.FORMAT1;
 		}
-		else if(line.matches("(\\s{4}|\\t)(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP)\\s+R[0-7]\\s*(,\\s*(#[0-9a-fA-F]*|\\w+))?(\\s*\\/\\/.*)?\\s*$")) {
+		else if(line.matches("(\\s{4}|\\t)(((LOAD|LOADIM|JMPRIND|JCONDRIN|POP|PUSH|ADDIM|SUBIM|LOOP)(\\s+R[0-7]\\s*)(,\\s*(#[0-9a-fA-F]*|\\w+)?))|(STORE(\\s+\\w+\\s*)(,\\s*R[0-7]\\s*)))(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.FORMAT2;
 		}
 		else if(line.matches("(\\s{4}|\\t)org\\s(\\d|[a-fA-F]){1,3}(\\s*\\/\\/.*)?\\s*$")) {
@@ -66,7 +66,7 @@ public class Assembler {
 			return Format.NONE;
 		}
 	}
-	
+
 	/*
 	 * Matches the a opcode with its corresponding binary representation
 	 */
@@ -107,7 +107,7 @@ public class Assembler {
 		default: return null;
 		}
 	}
-	
+
 	/*
 	 * Reads a file and translates each line of code into hexadecimal values that are written into another file 
 	 */
@@ -174,7 +174,7 @@ public class Assembler {
 		}
 		catch(IOException e) {
 		}
-		
+
 		//Second pass. 
 		try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String line;
@@ -225,46 +225,80 @@ public class Assembler {
 					}
 					break;
 				case FORMAT2:
-					//First 5 bits are the opCode
-					result.append(opCode(tokens[1]));
-					//Format 2 always has one register. Append the 3 bits of the register.
-					int register = Character.getNumericValue(tokens[2].charAt(1));
-					String bRegister = String.format("%3s", Integer.toBinaryString(register)).replace(' ','0');
-					result.append(bRegister);
-					//If the line has another parameter other than the register...
-					if(tokens.length > 3) {
-						//check if its a variable
-						if(vars.containsKey(tokens[3])) {
-							register = Integer.parseInt(vars.get(tokens[3]));
+					if(tokens[1].equals("STORE")) {
+						result.append("00011");
+						int register = Character.getNumericValue(tokens[3].charAt(1));
+						String bRegister = String.format("%3s", Integer.toBinaryString(register)).replace(' ','0');
+						result.append(bRegister);
+						if(vars.containsKey(tokens[2])) {
+							register = Integer.parseInt(vars.get(tokens[2]));
 							bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
 							result.append(bRegister);
 						}
 						//check if its a const
-						else if(cons.containsKey(tokens[3])) {
-							register = Integer.parseInt(cons.get(tokens[3]), 16);
+						else if(cons.containsKey(tokens[2])) {
+							register = Integer.parseInt(cons.get(tokens[2]), 16);
 							bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
 							result.append(bRegister);
 						}
 						//check if its a label
-						else if(labels.containsKey(tokens[3])){
-							register = Integer.parseInt(labels.get(tokens[3]));
+						else if(labels.containsKey(tokens[2])){
+							register = Integer.parseInt(labels.get(tokens[2]));
 							bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
 							result.append(bRegister);
 						}
 						//check if its a literal hexadecimal number
-						else if(tokens[3].matches("#(\\d[a-fA-F]|[a-fA-F]\\d|[a-fA-F]+|\\d+)")) {
-							register = Integer.parseInt(tokens[3].substring(1, tokens[3].length()), 16);
+						else if(tokens[2].matches("#(\\d[a-fA-F]|[a-fA-F]\\d|[a-fA-F]+|\\d+)")) {
+							register = Integer.parseInt(tokens[2].substring(1, tokens[2].length()), 16);
 							bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
 							result.append(bRegister);
 						}
 						else {
-							errorDetected(error ,asmLinePos, "Unable to resolve \"" + tokens[3] + "\"", line); 
+							errorDetected(error ,asmLinePos, "Unable to resolve \"" + tokens[2] + "\"", line); 
 							break;
 						}
-					}
-					//If it only has a register append the rest of the bits to achive 16 bits.
-					else {
-						result.append("00000000");
+					} else {
+						//First 5 bits are the opCode
+						result.append(opCode(tokens[1]));
+						//Format 2 always has one register. Append the 3 bits of the register.
+						int register = Character.getNumericValue(tokens[2].charAt(1));
+						String bRegister = String.format("%3s", Integer.toBinaryString(register)).replace(' ','0');
+						result.append(bRegister);
+						//If the line has another parameter other than the register...
+						if(tokens.length > 3) {
+							//check if its a variable
+							if(vars.containsKey(tokens[3])) {
+								register = Integer.parseInt(vars.get(tokens[3]));
+								bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
+								result.append(bRegister);
+							}
+							//check if its a const
+							else if(cons.containsKey(tokens[3])) {
+								register = Integer.parseInt(cons.get(tokens[3]), 16);
+								bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
+								result.append(bRegister);
+							}
+							//check if its a label
+							else if(labels.containsKey(tokens[3])){
+								register = Integer.parseInt(labels.get(tokens[3]));
+								bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
+								result.append(bRegister);
+							}
+							//check if its a literal hexadecimal number
+							else if(tokens[3].matches("#(\\d[a-fA-F]|[a-fA-F]\\d|[a-fA-F]+|\\d+)")) {
+								register = Integer.parseInt(tokens[3].substring(1, tokens[3].length()), 16);
+								bRegister = String.format("%8s", Integer.toBinaryString(register)).replace(' ','0');
+								result.append(bRegister);
+							}
+							else {
+								errorDetected(error ,asmLinePos, "Unable to resolve \"" + tokens[3] + "\"", line); 
+								break;
+							}
+						}
+						//If it only has a register append the rest of the bits to achive 16 bits.
+						else {
+							result.append("00000000");
+						}
 					}
 					resultHexa = Integer.toHexString(Integer.parseInt(result.substring(0,16),2)).toUpperCase();
 					if(linePos%2 == 1) linePos++;
@@ -382,7 +416,7 @@ public class Assembler {
 		}
 		return outputFile;
 	}
-	
+
 	/*
 	 * Writes a given error message with a line position to a specific file
 	 */
@@ -426,7 +460,7 @@ public class Assembler {
 			else if(line.matches("\\s.*"))
 				errorMsg = "Instruction only needs and address.";
 		}
-		
+
 		return errorMsg;
 	}
 }

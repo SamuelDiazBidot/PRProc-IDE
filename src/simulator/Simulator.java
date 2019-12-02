@@ -71,7 +71,7 @@ public class Simulator {
 			break;
 			//STORE [mem] <- R[Ra] address and memory the same thing?
 		case "00011":
-			currInstruction = instructionRegister + ": STORE" + " R" + Integer.toString(ra);
+			currInstruction = instructionRegister + ": STORE" + " " + Integer.toHexString(f2address)+", R" + Integer.toString(ra);
 			memory[f2address] = register[ra];
 			pc+=2;
 			break;
