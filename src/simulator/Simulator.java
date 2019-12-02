@@ -105,7 +105,7 @@ public class Simulator {
 		case "00111":
 			currInstruction = instructionRegister + ": ADD" + " R" + Integer.toString(ra) + " R" + Integer.toString(rb) + " R" + Integer.toString(rc);
 			//Get register number and add rb with rc. 
-			int sum = Integer.parseInt(register[rb], 16) + Integer.parseInt(register[rc], 16);
+			int sum = (Integer.parseInt(register[rb], 16) + Integer.parseInt(register[rc], 16)) &0xFF;
 			//Assign value of sum in register a.
 			if(ra>0)
 				register[ra] = String.format("%2s", Integer.toHexString(sum)).replace(' ','0');
@@ -117,7 +117,7 @@ public class Simulator {
 		case "01000":
 			currInstruction = instructionRegister + ": SUB" + " R" + Integer.toString(ra) + " R" + Integer.toString(rb) + " R" + Integer.toString(rc);
 			//Get register number and subtract rb with rc. 
-			int dif = Integer.parseInt(register[rb], 16) - Integer.parseInt(register[rc], 16);
+			int dif = (Integer.parseInt(register[rb], 16) - Integer.parseInt(register[rc], 16)&0xFF);
 			//Assign value of sum in register a.
 			if(ra>0)
 				register[ra] = Integer.toHexString(dif);
@@ -131,7 +131,7 @@ public class Simulator {
 			int dec2 = Integer.parseInt(binaryInstruction.substring(12, 16), 2);
 			String cons = Integer.toHexString(dec1) + Integer.toHexString(dec2);
 			currInstruction = instructionRegister + ": ADDIM" + " R" + Integer.toString(ra) + " " + cons;
-			sum = Integer.parseInt(cons, 16) + Integer.parseInt(register[ra], 16);
+			sum = (Integer.parseInt(cons, 16) + Integer.parseInt(register[ra], 16)&0xFF);
 			//Assign value of sum to register a
 			if(ra>0)
 				register[ra] = Integer.toHexString(sum);
@@ -141,11 +141,11 @@ public class Simulator {
 			//SUBIM R[Ra]<- R[Ra]-cons TODO: If underflow it return a 3 bit hex   number.
 		case "01010":
 			//Get literal number, register number and subtract the literal to ra.
-			dec1 = Integer.parseInt(binaryInstruction.substring(8, 12), 2);
-			dec2 = Integer.parseInt(binaryInstruction.substring(12, 16), 2);
-			cons = Integer.toHexString(dec1) + Integer.toHexString(dec2);
+//			dec1 = Integer.parseInt(binaryInstruction.substring(8, 12), 2);
+//			dec2 = Integer.parseInt(binaryInstruction.substring(12, 16), 2);
+			cons = Integer.toHexString(f2address);
 			currInstruction = instructionRegister + ": SUBIM" + " R" + Integer.toString(ra) + " " + cons;
-			dif = Integer.parseInt(cons, 16) - Integer.parseInt(register[ra], 16);
+			dif = ((Integer.parseInt(register[ra], 16) - f2address) &0xFF);
 			//Assign value of dif to register a 
 			if(ra>0)
 				register[ra] = Integer.toHexString(dif);
@@ -219,7 +219,7 @@ public class Simulator {
 			b = Integer.parseInt(register[rb], 16);
 			c = Integer.parseInt(register[rc], 16);
 			if(ra>0)
-				register[ra] = Integer.toHexString(b<<c);
+				register[ra] = Integer.toHexString((b<<c)&0xFF);
 			regChanged[ra] = true;
 			pc+=2;
 
@@ -230,10 +230,13 @@ public class Simulator {
 			b = Integer.parseInt(register[rb], 16);
 			c = Integer.parseInt(register[rc], 16);
 			if(ra>0) {
-				if(b%2==1) register[ra] = Integer.toHexString((b>>c)|0x80);
-				else register[ra] = Integer.toHexString(b>>c);
-				pc+=2;
+				register[ra] = Integer.toHexString(b);
+				for(int i = c; i>0; i--) {
+					if(Integer.parseInt(register[ra],16)%2==1) register[ra] = Integer.toHexString((Integer.parseInt(register[ra],16)>>1)|0x80);
+					else register[ra] = Integer.toHexString((Integer.parseInt(register[ra],16)>>1));
+				}
 			}
+			pc+=2;
 			regChanged[ra] = true;
 			break;
 			//ROTAL	R[Ra]<- R[Rb] rtl R[Rc]
@@ -242,8 +245,11 @@ public class Simulator {
 			b = Integer.parseInt(register[rb], 16);
 			c = Integer.parseInt(register[rc], 16);
 			if(ra>0) {
-				if((b & 0x8000) > 0) register[ra] = Integer.toHexString((b<<c)|0x01);
-				else register[ra] = Integer.toHexString(b<<c);
+				register[ra] = Integer.toHexString(b);
+				for(int i = c; i>0; i--) {
+					if((Integer.parseInt(register[ra],16)&0x80)>0) register[ra] = Integer.toHexString(((Integer.parseInt(register[ra],16)<<1)|0x01)&0xFF);
+					else register[ra] = Integer.toHexString((Integer.parseInt(register[ra],16)<<1));
+				}
 			}
 			pc+=2;
 			regChanged[ra] = true;
@@ -327,7 +333,7 @@ public class Simulator {
 		case "11110":
 			currInstruction = instructionRegister + ": CALL " + Integer.toHexString(f3address);
 			sp = sp -2;
-			memory[sp]  = Integer.toString(pc);
+			memory[sp]  = Integer.toString(pc + 2);
 			pc = f3address;
 			break;
 			//RETURN PC <- mem[SP] SP <- SP + 2

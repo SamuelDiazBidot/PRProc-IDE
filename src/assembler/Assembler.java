@@ -35,7 +35,7 @@ public class Assembler {
 		if(line.matches("(\\s{4}|\\t)(LOADRIND|STORERIND|ADD|SUB|AND|OR|XOR|NOT|NEG|SHIFTR|SHIFTL|ROTAR|ROTAL|GRT|GRTEQ|EQ|NEQ)\\s(\\s*R[0-7]\\s*,|\\s*R[0-7]){1,3}(\\s*\\/\\/.*)?\\s*$")) { 
 			return Format.FORMAT1;
 		}
-		else if(line.matches("(\\s{4}|\\t)(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP)\\s+R[0-7]\\s*(,\\s*(#[0-9a-fA-f]*|\\w+))?(\\s*\\/\\/.*)?\\s*$")) {
+		else if(line.matches("(\\s{4}|\\t)(LOAD|LOADIM|JMPRIND|JCONDRIN|POP|STORE|PUSH|ADDIM|SUBIM|LOOP)\\s+R[0-7]\\s*(,\\s*(#[0-9a-fA-F]*|\\w+))?(\\s*\\/\\/.*)?\\s*$")) {
 			return Format.FORMAT2;
 		}
 		else if(line.matches("(\\s{4}|\\t)org\\s(\\d|[a-fA-F]){1,3}(\\s*\\/\\/.*)?\\s*$")) {
@@ -266,7 +266,7 @@ public class Assembler {
 					else {
 						result.append("00000000");
 					}
-					resultHexa = Integer.toHexString(Integer.parseInt(result.substring(0),2)).toUpperCase();
+					resultHexa = Integer.toHexString(Integer.parseInt(result.substring(0,16),2)).toUpperCase();
 					if(linePos%2 == 1) linePos++;
 					if(resultHexa.length() < 4) {
 						if(ordered.put(linePos++, String.format("0" + resultHexa.toString().substring(0, 2)))!=null)
@@ -336,7 +336,7 @@ public class Assembler {
 					}
 					break;
 				case DEFINEBYTE:
-					linePos++;
+					linePos += tokens.length - 2;
 					break;
 				case CONSTANT:
 					break;

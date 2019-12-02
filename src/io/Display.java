@@ -35,7 +35,7 @@ public class Display extends Canvas {
 			g.fillRect(x + 10, 10, 30, 10);
 		}
 		//|
-		if(segments[6] == '1' && isPos) {
+		if(segments[5] == '1' && isPos) {
 			g.setColor(Color.GREEN);
 			g.fillRect(x + 0, 20, 10, 40);
 		}else {
@@ -51,7 +51,7 @@ public class Display extends Canvas {
 			g.fillRect(x + 40, 20, 10, 40);
 		}
 		// =
-		if(segments[5] == '1' && isPos) {
+		if(segments[6] == '1' && isPos) {
 			g.setColor(Color.GREEN);
 			g.fillRect(x + 10, 60, 30, 10);
 		}else {
