@@ -20,6 +20,7 @@ public class TrafficL extends Canvas {
 	boolean yellowOn = false;
 	boolean greenOn = false;
 	Timer timer;
+	boolean blinking = false;
 
 	public TrafficL(String input) {
 		this.input = input;
@@ -56,6 +57,7 @@ public class TrafficL extends Canvas {
 	//
 	public void flashingLights(Graphics g,Boolean Red, Boolean Yellow, Boolean Green) {
 		timer = new Timer();
+		blinking = true;
 		timer.schedule(new TimerTask() {
 			int i = 0;
 			@Override
@@ -128,10 +130,11 @@ public class TrafficL extends Canvas {
 			greenOn=false;
 			g.fillOval( 20,border*10,2*radius,2*radius );
 		}
+		if(blinking) {
+			timer.cancel();
+		}
 		if(input.charAt(input.length()-1)=='1') {
 			blink(g,input.charAt(3));
-		}else {
-			timer.cancel();
 		}
 	}
 
