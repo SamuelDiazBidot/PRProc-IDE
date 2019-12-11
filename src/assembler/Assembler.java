@@ -27,7 +27,6 @@ public class Assembler {
 		SPECIAL,
 		NONE
 	}
-	
 
 	/*
 	 * Matches a string with a format type
